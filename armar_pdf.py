@@ -9,8 +9,8 @@ from reportlab.lib.units import cm
 from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 
-RETO = "Biblioteca Digital de Instrucciones de Trabajo - Impresos Multiples"
-INTEGRANTES = ["Marco Afane", "Ever Gomez", "Moises Moran", "Luis Mejia", "Rodrigo Alvarenga"]
+RETO = "Biblioteca Digital de Instrucciones de Trabajo - Impresos Múltiples"
+INTEGRANTES = ["Marco Afane", "Ever Gómez", "Moisés Morán", "Luis Mejía", "Rodrigo Alvarenga"]
 REPOSITORIO = "https://github.com/marcoafane10/Fase2"
 
 
@@ -40,19 +40,27 @@ tabla.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#006
 historia += [Paragraph("Tabla de pruebas", estilos["Heading2"]), tabla, PageBreak()]
 
 for p in pruebas:
-    historia.append(Paragraph("Figura %d - %s" % (p["no"], escape(p["que"])), estilos["Heading3"]))
-    historia.append(Paragraph("URL: " + escape(p["url"]), estilos["Normal"]))
-    historia.append(Spacer(1, 6))
-    ruta = os.path.join(AQUI, "capturas", str(p["no"]) + ".png")
-    if os.path.exists(ruta):
-        historia.append(Image(ruta, width=20 * cm, height=10.5 * cm, kind="proportional"))
-    else:
-        marco = Table([["[Falta capturas/%d.png - pegar aqui la captura del navegador con la URL visible]" % p["no"]]],
-                      colWidths=[20 * cm], rowHeights=[8 * cm])
-        marco.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 1, colors.grey), ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-                                   ("VALIGN", (0, 0), (-1, -1), "MIDDLE")]))
-        historia.append(marco)
-    historia.append(PageBreak())
+    capturas = []
+    previa = os.path.join(AQUI, "capturas", str(p["no"]) + "a_formulario.png")
+    if os.path.exists(previa):
+        capturas.append(("Datos escritos en el formulario, antes de enviar", previa))
+    capturas.append(("Resultado en el navegador", os.path.join(AQUI, "capturas", str(p["no"]) + ".png")))
+    for parte, (subtitulo, ruta) in enumerate(capturas):
+        titulo = "Figura %d - %s" % (p["no"], escape(p["que"]))
+        if len(capturas) > 1:
+            titulo += " (%s)" % "ab"[parte]
+        historia.append(Paragraph(titulo, estilos["Heading3"]))
+        historia.append(Paragraph("Ruta probada: " + escape(p["url"]) + " &nbsp;&nbsp;|&nbsp;&nbsp; " + subtitulo, estilos["Normal"]))
+        historia.append(Spacer(1, 6))
+        if os.path.exists(ruta):
+            historia.append(Image(ruta, width=24 * cm, height=15 * cm, kind="proportional"))
+        else:
+            marco = Table([["[Falta %s - pegar aqui la captura del navegador con la URL visible]" % os.path.basename(ruta)]],
+                          colWidths=[24 * cm], rowHeights=[8 * cm])
+            marco.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 1, colors.grey), ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                                       ("VALIGN", (0, 0), (-1, -1), "MIDDLE")]))
+            historia.append(marco)
+        historia.append(PageBreak())
 
 SimpleDocTemplate(os.path.join(AQUI, "pruebas_fase2.pdf"), pagesize=landscape(A4),
                   leftMargin=1.5 * cm, rightMargin=1.5 * cm, topMargin=1.5 * cm, bottomMargin=1.5 * cm).build(historia)
