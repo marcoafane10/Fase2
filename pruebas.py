@@ -7,8 +7,7 @@ import subprocess
 import sys
 import tempfile
 
-# Ejecuta los casos de prueba contra una copia temporal del proyecto
-# (no modifica tu biblioteca.db). Uso: python pruebas.py
+
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 tmp = tempfile.mkdtemp()
