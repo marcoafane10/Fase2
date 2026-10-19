@@ -70,6 +70,7 @@ def resumen():
         desactualizadas=contDesactualizadas,
         sinClasificar=contSinClasificar,
         version_vigente=VERSION_VIGENTE,
+        porcentaje_vigentes=porcentajeVigentes,
     )
 
 
