@@ -1,0 +1,26 @@
+body { font-family: Arial, sans-serif; background: #f5f8ff; color: #0a1f44; margin: 0; padding: 24px; }
+h1 { border-bottom: 3px solid #f5b301; padding-bottom: 6px; }
+nav { margin-bottom: 20px; }
+nav a { margin-right: 16px; color: #006dff; font-weight: bold; text-decoration: none; }
+nav a:hover { text-decoration: underline; }
+table { border-collapse: collapse; width: 100%; background: #ffffff; margin-bottom: 20px; }
+th { background: #006dff; color: #ffffff; padding: 10px; text-align: left; }
+td { padding: 10px; border-bottom: 1px solid #e5e9f2; }
+label { display: block; margin-top: 12px; }
+input { padding: 8px; width: 320px; }
+button, .boton { margin-top: 16px; padding: 10px 18px; background: #006dff; color: #ffffff; border: 0; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 14px; }
+button.peligro { margin-top: 0; padding: 6px 12px; background: #c62828; }
+form.en-linea { display: inline; }
+.error { color: #a00000; font-weight: bold; }
+.nota { color: #4a5a7a; font-size: 14px; }
+
+
+tr.vigente td { background: #e3f7e8; color: #14632b; }
+tr.desactualizada td { background: #fff3d6; color: #8a5a00; }
+tr.sinclasificar td { background: #e8e8e8; color: #444444; }
+.tarjetas { display: flex; gap: 16px; margin-bottom: 20px; }
+.tarjeta { flex: 1; padding: 16px; border-radius: 8px; font-size: 18px; }
+.tarjeta strong { display: block; font-size: 32px; }
+.tarjeta.vigente { background: #e3f7e8; color: #14632b; }
+.tarjeta.desactualizada { background: #fff3d6; color: #8a5a00; }
+.tarjeta.sinclasificar { background: #e8e8e8; color: #444444; }
