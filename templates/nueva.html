@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block titulo %}Registrar{% endblock %}
+{% block contenido %}
+<h1>Registrar instruccion</h1>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form method="POST" action="/instrucciones/nueva">
+<label>Titulo</label>
+<input type="text" name="titulo" value="{{ datos['titulo'] }}">
+<label>Proceso</label>
+<input type="text" name="proceso" value="{{ datos['proceso'] }}">
+<label>Version</label>
+<input type="text" name="version" value="{{ datos['version'] }}">
+<label>Enlace al documento o video (opcional)</label>
+<input type="text" name="enlace" value="{{ datos['enlace'] }}">
+<button type="submit">Guardar</button>
+</form>
+{% endblock %}
