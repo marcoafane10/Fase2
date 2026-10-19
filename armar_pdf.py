@@ -8,13 +8,12 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import cm
 from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-# ---- COMPLETAR ANTES DE EJECUTAR ----
+
 RETO = "Biblioteca Digital de Instrucciones de Trabajo - Impresos Multiples"
 INTEGRANTES = ["Nombre 1", "Nombre 2", "Nombre 3", "Nombre 4"]
 REPOSITORIO = "https://github.com/USUARIO/REPOSITORIO"
-# --------------------------------------
-# Capturas reales del navegador (con la URL visible) en la carpeta capturas/
-# con nombre 1.png, 2.png, ... segun el numero de cada prueba.
+
+
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 estilos = getSampleStyleSheet()
