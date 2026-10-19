@@ -6,11 +6,10 @@ from flask import Flask, redirect, render_template, request
 
 app = Flask(__name__)
 
-# Ruta de la base de datos (se puede cambiar con la variable de entorno BIBLIOTECA_DB)
+
 RUTA_BD = os.environ.get("BIBLIOTECA_DB", os.path.join(os.path.dirname(__file__), "biblioteca.db"))
 
-# Version vigente del sistema (valor de prueba).
-# La ficha no fija un numero: confirmar con el Socio Formador.
+
 VERSION_VIGENTE = 3
 
 
@@ -21,7 +20,7 @@ def conectar():
 
 
 def clasificar(version):
-    # Decide la clasificacion de una instruccion segun su version
+    
     if version >= VERSION_VIGENTE:
         return "vigente"
     elif version >= 1:
@@ -35,7 +34,7 @@ def inicio():
     return redirect("/instrucciones")
 
 
-# ---------- CONSULTAR ----------
+
 @app.route("/instrucciones")
 def listar():
     conexion = conectar()
@@ -44,7 +43,7 @@ def listar():
     return render_template("instrucciones.html", instrucciones=filas, version_vigente=VERSION_VIGENTE)
 
 
-# ---------- RESUMEN (repeticion + decision) ----------
+
 @app.route("/resumen")
 def resumen():
     conexion = conectar()
@@ -79,7 +78,7 @@ def resumen():
     )
 
 
-# ---------- REGISTRAR ----------
+
 @app.route("/instrucciones/nueva", methods=["GET", "POST"])
 def nueva():
     error = ""
@@ -111,7 +110,7 @@ def nueva():
     return render_template("nueva.html", error=error, datos=datos)
 
 
-# ---------- MODIFICAR (actualizar la version) ----------
+
 @app.route("/instrucciones/editar/<int:idInstruccion>", methods=["GET", "POST"])
 def editar(idInstruccion):
     conexion = conectar()
@@ -149,7 +148,7 @@ def editar(idInstruccion):
     return render_template("editar.html", instruccion=fila, historial=historial, error=error)
 
 
-# ---------- ELIMINAR ----------
+
 @app.route("/instrucciones/eliminar/<int:idInstruccion>", methods=["POST"])
 def eliminar(idInstruccion):
     conexion = conectar()
