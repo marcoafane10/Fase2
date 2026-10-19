@@ -8,7 +8,6 @@ import sys
 import tempfile
 
 
-
 AQUI = os.path.dirname(os.path.abspath(__file__))
 tmp = tempfile.mkdtemp()
 for nombre in ("app.py", "crear_bd.py", "templates", "static"):
