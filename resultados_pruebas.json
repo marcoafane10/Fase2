@@ -1,0 +1,82 @@
+[
+  {
+    "no": 1,
+    "que": "Registro valido",
+    "entrada": "Limpieza de rodillos, Impresion, version 3",
+    "esperado": "Redirige al listado y la instruccion aparece",
+    "obtenido": "Redirige y aparece en el listado",
+    "url": "http://127.0.0.1:5000/instrucciones/nueva"
+  },
+  {
+    "no": 2,
+    "que": "Registro invalido",
+    "entrada": "Titulo vacio, Corte, version 2",
+    "esperado": "Mensaje de error y no se guarda",
+    "obtenido": "Muestra el error y no se guardo",
+    "url": "http://127.0.0.1:5000/instrucciones/nueva"
+  },
+  {
+    "no": 3,
+    "que": "Registro invalido (version incorrecta)",
+    "entrada": "Prueba, Corte, version abc",
+    "esperado": "Mensaje de error y no se guarda",
+    "obtenido": "Muestra el error y no se guardo",
+    "url": "http://127.0.0.1:5000/instrucciones/nueva"
+  },
+  {
+    "no": 4,
+    "que": "Consulta del listado",
+    "entrada": "Abrir /instrucciones",
+    "esperado": "Tabla con las instrucciones y su version",
+    "obtenido": "Tabla con las 6 instrucciones",
+    "url": "http://127.0.0.1:5000/instrucciones"
+  },
+  {
+    "no": 5,
+    "que": "Modificacion",
+    "entrada": "Instruccion 4: version 1 -> 3",
+    "esperado": "Version actualizada a 3 y historial con 2 registros",
+    "obtenido": "Version 3, historial con 2 registros",
+    "url": "http://127.0.0.1:5000/instrucciones/editar/4"
+  },
+  {
+    "no": 6,
+    "que": "Resumen con datos A",
+    "entrada": "Datos de ejemplo + registro de prueba 1 + modificacion de prueba 5",
+    "esperado": "Vigentes: 5, Desactualizadas: 1 (de 6 instrucciones)",
+    "obtenido": "Vigentes: 5, Desactualizadas: 1",
+    "url": "http://127.0.0.1:5000/resumen"
+  },
+  {
+    "no": 7,
+    "que": "Eliminacion",
+    "entrada": "Eliminar instruccion 2 (Ajuste de maquina troqueladora)",
+    "esperado": "La instruccion desaparece del listado",
+    "obtenido": "Eliminada, quedan 5",
+    "url": "http://127.0.0.1:5000/instrucciones"
+  },
+  {
+    "no": 8,
+    "que": "Resumen con datos B",
+    "entrada": "Tras eliminar la instruccion 2 y registrar 'Embalaje de cajas' (v1) y 'Rotulado de tarimas' (v2)",
+    "esperado": "Vigentes: 5, Desactualizadas: 2 (de 7 instrucciones)",
+    "obtenido": "Vigentes: 5, Desactualizadas: 2",
+    "url": "http://127.0.0.1:5000/resumen"
+  },
+  {
+    "no": 9,
+    "que": "Modificacion invalida",
+    "entrada": "Instruccion 5: version 3 -> 2",
+    "esperado": "Mensaje de error y no se guarda",
+    "obtenido": "Muestra el error",
+    "url": "http://127.0.0.1:5000/instrucciones/editar/5"
+  },
+  {
+    "no": 10,
+    "que": "Consulta parametrizada (inyeccion SQL)",
+    "entrada": "Titulo: x'); DROP TABLE instrucciones;--",
+    "esperado": "Se guarda como texto; la tabla sigue existiendo",
+    "obtenido": "Tabla intacta, titulo guardado como texto",
+    "url": "http://127.0.0.1:5000/instrucciones/nueva"
+  }
+]
