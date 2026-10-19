@@ -1,6 +1,6 @@
 [
   {
-    "no": 1,
+    "no": 1, 
     "que": "Registro valido",
     "entrada": "Limpieza de rodillos, Impresion, version 3",
     "esperado": "Redirige al listado y la instruccion aparece",
