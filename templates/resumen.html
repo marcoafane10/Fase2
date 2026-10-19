@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}Resumen{% endblock %}
+{% block contenido %}
+<h1>Resumen de instrucciones</h1>
+<p class="nota">Una instruccion es vigente si su version es mayor o igual a {{ version_vigente }}.</p>
+<div class="tarjetas">
+<div class="tarjeta vigente">Vigentes<strong>{{ vigentes }}</strong></div>
+<div class="tarjeta desactualizada">Desactualizadas<strong>{{ desactualizadas }}</strong></div>
+{% if sinClasificar > 0 %}<div class="tarjeta sinclasificar">Sin clasificar<strong>{{ sinClasificar }}</strong></div>{% endif %}
+</div>
+<p>Total de instrucciones: {{ total }}</p>
+<table>
+<tr><th>Titulo</th><th>Version</th><th>Clasificacion</th></tr>
+{% for d in detalle %}
+<tr class="{{ d['clasificacion'].replace(' ', '') }}">
+<td>{{ d['titulo'] }}</td><td>{{ d['version'] }}</td><td>{{ d['clasificacion'] }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

@@ -1,6 +1,14 @@
+import os
 import sqlite3
 
-conexion = sqlite3.connect("biblioteca.db")
+# Crea las tablas de la Biblioteca Digital de Instrucciones y carga datos de ejemplo.
+# ATENCION: borra las tablas si ya existen y las vuelve a crear.
+
+# Misma ruta que usa app.py: junto a este archivo (o la variable BIBLIOTECA_DB).
+# Asi funciona aunque se ejecute desde otra carpeta.
+RUTA_BD = os.environ.get("BIBLIOTECA_DB", os.path.join(os.path.dirname(os.path.abspath(__file__)), "biblioteca.db"))
+
+conexion = sqlite3.connect(RUTA_BD)
 
 conexion.execute("DROP TABLE IF EXISTS historial_versiones")
 conexion.execute("DROP TABLE IF EXISTS instrucciones")
@@ -39,7 +47,7 @@ for instruccion in instrucciones:
         "INSERT INTO instrucciones (titulo, proceso, version, fecha_actualizacion, enlace) VALUES (?, ?, ?, ?, ?)",
         instruccion,
     )
-   
+    # Se guarda la version inicial en el historial
     conexion.execute(
         "INSERT INTO historial_versiones (instruccion_id, version, fecha) VALUES (?, ?, ?)",
         (cursor.lastrowid, instruccion[2], instruccion[3]),
@@ -47,4 +55,4 @@ for instruccion in instrucciones:
 
 conexion.commit()
 conexion.close()
-print("Base de datos creada con", len(instrucciones), "instrucciones de ejemplo.")
+print("Base de datos creada en", RUTA_BD, "con", len(instrucciones), "instrucciones de ejemplo.")

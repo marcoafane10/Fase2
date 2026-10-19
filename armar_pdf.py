@@ -10,8 +10,8 @@ from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, S
 
 
 RETO = "Biblioteca Digital de Instrucciones de Trabajo - Impresos Multiples"
-INTEGRANTES = ["Nombre 1", "Nombre 2", "Nombre 3", "Nombre 4"]
-REPOSITORIO = "https://github.com/USUARIO/REPOSITORIO"
+INTEGRANTES = ["Marco Afane", "Ever Gomez", "Moises Moran", "Luis Mejia", "Rodrigo Alvarenga"]
+REPOSITORIO = "https://github.com/marcoafane10/Fase2"
 
 
 

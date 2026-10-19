@@ -11,10 +11,11 @@ input { padding: 8px; width: 320px; }
 button, .boton { margin-top: 16px; padding: 10px 18px; background: #006dff; color: #ffffff; border: 0; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 14px; }
 button.peligro { margin-top: 0; padding: 6px 12px; background: #c62828; }
 form.en-linea { display: inline; }
+form:not(.en-linea) button { display: block; }
 .error { color: #a00000; font-weight: bold; }
 .nota { color: #4a5a7a; font-size: 14px; }
 
-
+/* Clasificaciones del resumen: un color distinto para cada una */
 tr.vigente td { background: #e3f7e8; color: #14632b; }
 tr.desactualizada td { background: #fff3d6; color: #8a5a00; }
 tr.sinclasificar td { background: #e8e8e8; color: #444444; }
