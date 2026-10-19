@@ -57,7 +57,11 @@ def resumen():
             clasificacion = "sin clasificar"
             contSinClasificar = contSinClasificar + 1
         detalle.append({"titulo": fila["titulo"], "version": fila["version"], "clasificacion": clasificacion})
-
+# Porcentaje de instrucciones vigentes
+    if len(filas) > 0:
+        porcentajeVigentes = round(contVigentes * 100 / len(filas), 2)
+    else:
+        porcentajeVigentes = 0
     return render_template(
         "resumen.html",
         detalle=detalle,
