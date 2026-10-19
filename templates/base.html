@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>{% block titulo %}{% endblock %} - Biblioteca de Instrucciones</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav>
+<a href="/instrucciones">Listado</a>
+<a href="/instrucciones/nueva">Registrar instruccion</a>
+<a href="/resumen">Resumen</a>
+</nav>
+{% block contenido %}{% endblock %}
+</body>
+</html>
