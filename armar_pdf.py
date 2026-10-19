@@ -62,6 +62,7 @@ for p in pruebas:
             historia.append(marco)
         historia.append(PageBreak())
 
+
 SimpleDocTemplate(os.path.join(AQUI, "pruebas_fase2.pdf"), pagesize=landscape(A4),
                   leftMargin=1.5 * cm, rightMargin=1.5 * cm, topMargin=1.5 * cm, bottomMargin=1.5 * cm).build(historia)
 print("PDF generado: pruebas_fase2.pdf")
