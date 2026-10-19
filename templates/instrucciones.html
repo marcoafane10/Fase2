@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block titulo %}Listado{% endblock %}
+{% block contenido %}
+<h1>Instrucciones de trabajo</h1>
+<p class="nota">Version vigente del sistema: {{ version_vigente }}</p>
+<table>
+<tr><th>ID</th><th>Titulo</th><th>Proceso</th><th>Version</th><th>Ultima actualizacion</th><th>Acciones</th></tr>
+{% for i in instrucciones %}
+<tr>
+<td>{{ i['id'] }}</td>
+<td>{{ i['titulo'] }}</td>
+<td>{{ i['proceso'] }}</td>
+<td>{{ i['version'] }}</td>
+<td>{{ i['fecha_actualizacion'] }}</td>
+<td>
+<a class="boton" href="/instrucciones/editar/{{ i['id'] }}">Actualizar version</a>
+<form class="en-linea" method="POST" action="/instrucciones/eliminar/{{ i['id'] }}" onsubmit="return confirm('Eliminar esta instruccion?');">
+<button class="peligro" type="submit">Eliminar</button>
+</form>
+</td>
+</tr>
+{% else %}
+<tr><td colspan="6">No hay instrucciones registradas.</td></tr>
+{% endfor %}
+</table>
+{% endblock %}
