@@ -1,20 +1,32 @@
 {% extends "base.html" %}
 {% block titulo %}Resumen{% endblock %}
 {% block contenido %}
-<h1>Resumen de instrucciones</h1>
-<p class="nota">Una instruccion es vigente si su version es mayor o igual a {{ version_vigente }}.</p>
-<div class="tarjetas">
-<div class="tarjeta vigente">Vigentes<strong>{{ vigentes }}</strong></div>
-<div class="tarjeta desactualizada">Desactualizadas<strong>{{ desactualizadas }}</strong></div>
-{% if sinClasificar > 0 %}<div class="tarjeta sinclasificar">Sin clasificar<strong>{{ sinClasificar }}</strong></div>{% endif %}
+<div class="encabezado">
+  <div>
+    <p class="etiqueta">Resumen</p>
+    <h1>Estado de la biblioteca</h1>
+    <p class="sub">Completa: tiene documento y enlace de video · Falta video: tiene documento pero no video · Sin documento: todavía no se ha subido.</p>
+  </div>
 </div>
-<p>Total de instrucciones: {{ total }}</p>
-<table>
-<tr><th>Titulo</th><th>Version</th><th>Clasificacion</th></tr>
-{% for d in detalle %}
-<tr class="{{ d['clasificacion'].replace(' ', '') }}">
-<td>{{ d['titulo'] }}</td><td>{{ d['version'] }}</td><td>{{ d['clasificacion'] }}</td>
-</tr>
-{% endfor %}
-</table>
+
+<div class="tarjetas" data-completas="{{ completas }}" data-falta-video="{{ faltaVideo }}" data-sin-documento="{{ sinDocumento }}">
+  <div class="tarjeta completa"><span>Completas</span><strong>{{ completas }}</strong></div>
+  <div class="tarjeta falta-video"><span>Falta video</span><strong>{{ faltaVideo }}</strong></div>
+  <div class="tarjeta sin-documento"><span>Sin documento</span><strong>{{ sinDocumento }}</strong></div>
+</div>
+
+<section class="panel">
+  <h2>Detalle (primero las que necesitan atención)</h2>
+  <ul class="detalle">
+    {% for d in detalle %}
+    <li class="fila-animada {{ d['clasificacion'].replace(' ', '-') }}" style="--n: {{ loop.index0 }}">
+      <span><a class="titulo-enlace" href="/instrucciones/{{ d['id'] }}/documentos">{{ d['titulo'] }}</a><span class="sub">{{ d['proceso'] }}{% if d['doc_version'] %} · documento v{{ d['doc_version'] }}{% endif %}</span></span>
+      <span class="chip {{ d['clasificacion'].replace(' ', '-') }}">{{ d['clasificacion']|capitalize }}</span>
+    </li>
+    {% else %}
+    <li>No hay instrucciones registradas.</li>
+    {% endfor %}
+  </ul>
+  <p class="sub">Total: {{ total }} instrucciones.</p>
+</section>
 {% endblock %}
