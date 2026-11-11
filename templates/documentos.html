@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block titulo %}Documentos · {{ instruccion['titulo'] }}{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <div>
+    <p class="etiqueta"><a href="/instrucciones">Instrucciones</a> / {{ instruccion['proceso'] }}</p>
+    <h1>{{ instruccion['titulo'] }}</h1>
+    <div class="datos-linea">
+      <span class="version">Instrucción v{{ instruccion['version'] }}</span>
+      <span class="sub">{{ versiones|length }} versión(es) del documento</span>
+      <a class="doc" href="/instrucciones/editar/{{ instruccion['id'] }}">Nueva versión de la instrucción</a>
+    </div>
+  </div>
+</div>
+
+<div class="rejilla-documentos">
+  <section class="panel">
+    <h2>Versiones del documento</h2>
+    <p class="sub">De la más reciente a la más antigua. Subir un documento nuevo crea otra versión; las anteriores se conservan.</p>
+    <div class="tabla-contenedor">
+    <table class="tabla tabla-versiones">
+      <thead><tr><th>Versión</th><th>Archivo</th><th>Video</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+      {% for v in versiones %}
+        <tr class="fila-animada" style="--n: {{ loop.index0 }}">
+          <td><span class="version">v{{ v['version'] }}</span></td>
+          <td>{{ v['nombre_original'] }}<span class="sub">{{ v['tamano_kb'] }} KB · subido {{ v['fecha_subida'].strftime('%Y-%m-%d %H:%M') }}</span></td>
+          <td>{% if v['enlace_video'] %}<a class="doc" href="{{ v['enlace_video'] }}" target="_blank" rel="noopener">Ver video ↗</a>{% else %}<span class="sub">Sin video</span>{% endif %}</td>
+          <td><span class="chip {{ v['estado'] }}">{{ v['estado']|capitalize }}</span></td>
+          <td><a class="boton boton-chico" href="/documentos/{{ v['id'] }}/descargar">Descargar</a></td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" class="vacio">Esta instrucción todavía no tiene documento.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>{{ 'Subir nueva versión' if versiones else 'Subir documento' }}</h2>
+    <p class="sub">PDF o Word (.pdf, .doc, .docx), máximo {{ maximo }} MB.</p>
+    {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+    <form method="POST" action="/instrucciones/{{ instruccion['id'] }}/documentos" enctype="multipart/form-data" class="formulario">
+      <label for="documento">Archivo</label>
+      <input type="file" id="documento" name="documento" accept=".pdf,.doc,.docx">
+      <label for="enlace_video">Enlace del video <span class="opcional">(opcional)</span></label>
+      <input type="text" id="enlace_video" name="enlace_video" value="{{ enlace_video }}" placeholder="https://youtube.com/…">
+      <div class="botones"><button type="submit" class="boton">Subir documento</button></div>
+    </form>
+  </section>
+</div>
+{% endblock %}

@@ -1,19 +1,40 @@
 {% extends "base.html" %}
-{% block titulo %}Actualizar version{% endblock %}
+{% block titulo %}{{ instruccion['titulo'] }}{% endblock %}
 {% block contenido %}
-<h1>Actualizar version</h1>
-<p><strong>{{ instruccion['titulo'] }}</strong> ({{ instruccion['proceso'] }}) - version actual: {{ instruccion['version'] }}</p>
-{% if error %}<p class="error">{{ error }}</p>{% endif %}
-<form method="POST" action="/instrucciones/editar/{{ instruccion['id'] }}">
-<label>Nueva version</label>
-<input type="text" name="version">
-<button type="submit">Guardar</button>
-</form>
-<h2>Historial de versiones</h2>
-<table>
-<tr><th>Version</th><th>Fecha</th></tr>
-{% for h in historial %}
-<tr><td>{{ h['version'] }}</td><td>{{ h['fecha'] }}</td></tr>
-{% endfor %}
-</table>
+<div class="encabezado">
+  <div>
+    <p class="etiqueta"><a href="/instrucciones">Instrucciones</a> / {{ instruccion['proceso'] }}</p>
+    <h1>{{ instruccion['titulo'] }}</h1>
+    <div class="datos-linea">
+      <span class="version">v{{ instruccion['version'] }}</span>
+      <span class="sub">Última actualización: {{ instruccion['fecha_actualizacion'] }}</span>
+      <a class="doc" href="/instrucciones/{{ instruccion['id'] }}/documentos">Ver documentos</a>
+    </div>
+  </div>
+</div>
+
+<div class="rejilla-editar">
+  <div class="columna">
+    <section class="panel">
+      <h2>Nueva versión de la instrucción</h2>
+      <p class="sub">La versión actual es {{ instruccion['version'] }}. La nueva debe ser mayor.</p>
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+      <form method="POST" action="/instrucciones/editar/{{ instruccion['id'] }}" class="formulario en-fila">
+        <label for="version" class="oculto">Nueva versión</label>
+        <input type="text" id="version" name="version" inputmode="numeric" placeholder="{{ instruccion['version'] + 1 }}">
+        <button type="submit" class="boton">Guardar versión</button>
+      </form>
+    </section>
+  </div>
+  <div class="columna">
+    <section class="panel">
+      <h2>Historial de la instrucción</h2>
+      <ol class="historial">
+        {% for h in historial %}
+        <li class="fila-animada" style="--n: {{ loop.index0 }}"><span class="version">v{{ h['version'] }}</span><span>{{ h['fecha'] }}</span></li>
+        {% endfor %}
+      </ol>
+    </section>
+  </div>
+</div>
 {% endblock %}

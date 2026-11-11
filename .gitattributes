@@ -1,0 +1,6 @@
+# Archivos binarios: Git no debe cambiar sus saltos de linea
+*.pdf binary
+*.doc binary
+*.docx binary
+*.png binary
+*.jpg binary

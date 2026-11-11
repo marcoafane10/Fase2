@@ -2,15 +2,37 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>{% block titulo %}{% endblock %} - Biblioteca de Instrucciones</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block titulo %}{% endblock %} · Biblioteca de Instrucciones</title>
+<link rel="icon" href="{{ url_for('static', filename='logo_im.png') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<nav>
-<a href="/instrucciones">Listado</a>
-<a href="/instrucciones/nueva">Registrar instruccion</a>
-<a href="/resumen">Resumen</a>
-</nav>
-{% block contenido %}{% endblock %}
+<header class="cabecera">
+  <div class="cabecera-contenido">
+    <a class="marca" href="/instrucciones">
+      <img src="{{ url_for('static', filename='logo_im.png') }}" alt="Impresos Múltiples" width="44" height="32">
+      <span><strong>Biblioteca de Instrucciones</strong><small>Impresos Múltiples</small></span>
+    </a>
+    <nav class="menu">
+      {% set ruta = request.path %}
+      <a href="/instrucciones" class="{{ 'activo' if ruta.startswith('/instrucciones') and ruta != '/instrucciones/nueva' }}">Instrucciones</a>
+      <a href="/resumen" class="{{ 'activo' if ruta == '/resumen' }}">Resumen</a>
+      <a href="/instrucciones/nueva" class="boton boton-claro {{ 'activo' if ruta == '/instrucciones/nueva' }}">+ Nueva</a>
+    </nav>
+  </div>
+</header>
+<main class="pagina">
+  {% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria, m in mensajes %}
+      <div class="{{ 'error' if categoria == 'error' else 'aviso' }}" role="status">{{ m }}</div>
+    {% endfor %}
+  {% endwith %}
+  {% block contenido %}{% endblock %}
+</main>
+<footer class="pie">Biblioteca Digital de Instrucciones · Reto de Socio Formador con Impresos Múltiples</footer>
 </body>
 </html>

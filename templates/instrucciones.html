@@ -1,26 +1,43 @@
 {% extends "base.html" %}
-{% block titulo %}Listado{% endblock %}
+{% block titulo %}Instrucciones{% endblock %}
 {% block contenido %}
-<h1>Instrucciones de trabajo</h1>
-<p class="nota">Version vigente del sistema: {{ version_vigente }}</p>
-<table>
-<tr><th>ID</th><th>Titulo</th><th>Proceso</th><th>Version</th><th>Ultima actualizacion</th><th>Acciones</th></tr>
-{% for i in instrucciones %}
-<tr>
-<td>{{ i['id'] }}</td>
-<td>{{ i['titulo'] }}</td>
-<td>{{ i['proceso'] }}</td>
-<td>{{ i['version'] }}</td>
-<td>{{ i['fecha_actualizacion'] }}</td>
-<td>
-<a class="boton" href="/instrucciones/editar/{{ i['id'] }}">Actualizar version</a>
-<form class="en-linea" method="POST" action="/instrucciones/eliminar/{{ i['id'] }}" onsubmit="return confirm('Eliminar esta instruccion?');">
-<button class="peligro" type="submit">Eliminar</button>
-</form>
-</td>
-</tr>
-{% else %}
-<tr><td colspan="6">No hay instrucciones registradas.</td></tr>
-{% endfor %}
+<div class="encabezado">
+  <div>
+    <p class="etiqueta">Biblioteca</p>
+    <h1>Instrucciones de trabajo</h1>
+  </div>
+  <a class="boton" href="/instrucciones/nueva">+ Registrar instrucción</a>
+</div>
+
+<div class="tabla-contenedor">
+<table class="tabla tabla-lista">
+  <thead>
+    <tr><th>Instrucción</th><th>Versión</th><th>Documento</th><th>Video</th><th>Estado</th><th class="derecha">Acciones</th></tr>
+  </thead>
+  <tbody>
+  {% for i in instrucciones %}
+    <tr class="fila-animada" style="--n: {{ loop.index0 }}">
+      <td><a class="titulo-enlace" href="/instrucciones/{{ i['id'] }}/documentos">{{ i['titulo'] }}</a><span class="sub">{{ i['proceso'] }}</span></td>
+      <td data-etiqueta="Versión"><span class="version">v{{ i['version'] }}</span></td>
+      <td data-etiqueta="Documento">
+        {% if i['doc_id'] %}<a class="doc" href="/documentos/{{ i['doc_id'] }}/descargar">{{ i['nombre_original'] }}</a><span class="sub">versión {{ i['doc_version'] }}</span>
+        {% else %}<span class="sub">Sin documento</span>{% endif %}
+      </td>
+      <td data-etiqueta="Video">{% if i['enlace_video'] %}<a class="doc" href="{{ i['enlace_video'] }}" target="_blank" rel="noopener">Ver video ↗</a>{% else %}<span class="sub">Sin video</span>{% endif %}</td>
+      <td data-etiqueta="Estado"><span class="chip {{ i['estado_doc'].replace(' ', '-') }}">{{ i['estado_doc']|capitalize }}</span></td>
+      <td class="celda-acciones"><div class="acciones">
+        <a class="boton boton-chico" href="/instrucciones/{{ i['id'] }}/documentos">Documentos</a>
+        <a class="boton boton-chico boton-secundario" href="/instrucciones/editar/{{ i['id'] }}">Versión</a>
+        <form method="POST" action="/instrucciones/eliminar/{{ i['id'] }}" onsubmit="return confirm('¿Eliminar «{{ i['titulo'] }}» y todos sus documentos?');">
+          <button class="boton boton-chico boton-peligro" type="submit">Eliminar</button>
+        </form>
+      </div></td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6" class="vacio">Todavía no hay instrucciones. <a href="/instrucciones/nueva">Registra la primera</a>.</td></tr>
+  {% endfor %}
+  </tbody>
 </table>
+</div>
+<p class="nota">Se muestran {{ instrucciones|length }} instrucciones. Eliminar una instrucción borra también todas las versiones de su documento.</p>
 {% endblock %}
