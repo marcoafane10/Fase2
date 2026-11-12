@@ -1,9 +1,10 @@
+import csv
 import os
 from datetime import date
-from io import BytesIO
+from io import BytesIO, StringIO
 
 import mysql.connector
-from flask import Flask, abort, flash, redirect, render_template, request, send_file
+from flask import Flask, Response, abort, flash, redirect, render_template, request, send_file
 
 app = Flask(__name__)
 # Necesaria para los mensajes de confirmacion (flash) entre paginas
@@ -126,21 +127,75 @@ def inicio():
     return redirect("/instrucciones")
 
 
-# ---------- CONSULTAR ----------
+# ---------- CONSULTAR (con buscador y filtros) ----------
 @app.route("/instrucciones")
 def listar():
+    busqueda = request.args.get("q", "").strip()
+    proceso = request.args.get("proceso", "").strip()
+    filtroDoc = request.args.get("documento", "").strip()
+    estado = request.args.get("estado", "activa")
+    if estado not in ("activa", "archivada"):
+        estado = "activa"
+
+    # El buscador encuentra por titulo de la instruccion o por nombre de cualquiera de sus archivos.
+    # Se usan parametros %s: nunca se concatena lo que escribe el usuario.
+    condiciones = ["i.estado = %s"]
+    parametros = [estado]
+    if busqueda != "":
+        condiciones.append("(i.titulo LIKE %s OR EXISTS (SELECT 1 FROM documentos b "
+                           "WHERE b.instruccion_id = i.id AND b.nombre_original LIKE %s))")
+        parametros.append("%" + busqueda + "%")
+        parametros.append("%" + busqueda + "%")
+    if proceso != "":
+        condiciones.append("i.proceso = %s")
+        parametros.append(proceso)
+    sql = SQL_INSTRUCCIONES + " WHERE " + " AND ".join(condiciones)
+
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
-    cursor.execute(SQL_INSTRUCCIONES + " ORDER BY i.titulo")
+    cursor.execute(sql + " ORDER BY i.titulo", parametros)
+    filas = cursor.fetchall()
+    cursor.execute("SELECT DISTINCT proceso FROM instrucciones ORDER BY proceso")
+    procesos = [f["proceso"] for f in cursor.fetchall()]
+    cursor.execute("SELECT COUNT(*) AS n FROM instrucciones WHERE estado = 'archivada'")
+    archivadas = cursor.fetchone()["n"]
+    cursor.close()
+    conexion.close()
+
+    # El filtro por estado del documento usa la misma decision del resumen
+    instrucciones = []
+    for fila in filas:
+        fila["estado_doc"] = estado_documento(fila)
+        if filtroDoc == "" or fila["estado_doc"] == filtroDoc:
+            instrucciones.append(fila)
+    return render_template("instrucciones.html", instrucciones=instrucciones, procesos=procesos,
+                           busqueda=busqueda, proceso=proceso, filtroDoc=filtroDoc,
+                           estado=estado, archivadas=archivadas)
+
+
+# ---------- EXPORTAR A CSV (se abre en Excel) ----------
+@app.route("/instrucciones/exportar.csv")
+def exportar_csv():
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    # Misma consulta del listado: no trae el contenido de los archivos
+    cursor.execute(SQL_INSTRUCCIONES + " WHERE i.estado = 'activa' ORDER BY i.proceso, i.titulo")
     filas = cursor.fetchall()
     cursor.close()
     conexion.close()
 
-    instrucciones = []
+    salida = StringIO()
+    escritor = csv.writer(salida)
+    escritor.writerow(["ID", "Título", "Proceso", "Versión de la instrucción", "Última actualización",
+                       "Documento", "Versión del documento", "Enlace del video", "Estado"])
     for fila in filas:
-        fila["estado_doc"] = estado_documento(fila)
-        instrucciones.append(fila)
-    return render_template("instrucciones.html", instrucciones=instrucciones)
+        escritor.writerow([fila["id"], fila["titulo"], fila["proceso"], fila["version"], fila["fecha_actualizacion"],
+                           fila["nombre_original"] or "", fila["doc_version"] or "", fila["enlace_video"] or "",
+                           estado_documento(fila)])
+    # utf-8-sig: Excel muestra bien los acentos
+    nombre = "instrucciones_" + date.today().isoformat() + ".csv"
+    return Response(salida.getvalue().encode("utf-8-sig"), mimetype="text/csv",
+                    headers={"Content-Disposition": "attachment; filename=" + nombre})
 
 
 # ---------- RESUMEN (repeticion + decision) ----------
@@ -148,7 +203,8 @@ def listar():
 def resumen():
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
-    cursor.execute(SQL_INSTRUCCIONES + " ORDER BY i.titulo")
+    # Las instrucciones archivadas no cuentan en el resumen
+    cursor.execute(SQL_INSTRUCCIONES + " WHERE i.estado = 'activa' ORDER BY i.titulo")
     filas = cursor.fetchall()
     cursor.close()
     conexion.close()
@@ -156,6 +212,7 @@ def resumen():
     contCompletas = 0
     contFaltaVideo = 0
     contSinDocumento = 0
+    porProceso = {}
     detalle = []
     for fila in filas:
         if fila["doc_version"] is not None and fila["enlace_video"]:
@@ -167,8 +224,25 @@ def resumen():
         else:
             clasificacion = "sin documento"
             contSinDocumento = contSinDocumento + 1
+        # Contadores por proceso (Empaque, Corte, ...)
+        if fila["proceso"] not in porProceso:
+            porProceso[fila["proceso"]] = {"completa": 0, "falta video": 0, "sin documento": 0, "total": 0}
+        porProceso[fila["proceso"]][clasificacion] = porProceso[fila["proceso"]][clasificacion] + 1
+        porProceso[fila["proceso"]]["total"] = porProceso[fila["proceso"]]["total"] + 1
+
         detalle.append({"id": fila["id"], "titulo": fila["titulo"], "proceso": fila["proceso"],
                         "doc_version": fila["doc_version"], "clasificacion": clasificacion})
+
+    # Porcentajes (si no hay registros quedan en 0 para no dividir entre cero)
+    total = len(filas)
+    if total > 0:
+        porcentajeCompletas = round(contCompletas * 100 / total, 1)
+        porcentajeFaltaVideo = round(contFaltaVideo * 100 / total, 1)
+        porcentajeSinDocumento = round(contSinDocumento * 100 / total, 1)
+    else:
+        porcentajeCompletas = 0
+        porcentajeFaltaVideo = 0
+        porcentajeSinDocumento = 0
 
     # Primero las que necesitan atencion
     orden = {"sin documento": 0, "falta video": 1, "completa": 2}
@@ -177,10 +251,14 @@ def resumen():
     return render_template(
         "resumen.html",
         detalle=detalle,
-        total=len(filas),
+        total=total,
         completas=contCompletas,
         faltaVideo=contFaltaVideo,
         sinDocumento=contSinDocumento,
+        porcentaje_completas=porcentajeCompletas,
+        porcentaje_falta_video=porcentajeFaltaVideo,
+        porcentaje_sin_documento=porcentajeSinDocumento,
+        porProceso=sorted(porProceso.items()),
     )
 
 
@@ -328,8 +406,48 @@ def editar(idInstruccion):
         conexion.close()
         abort(404)
 
+    # Documento vigente (la version mas reciente), sin traer el contenido del archivo
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT id, version, nombre_original, enlace_video FROM documentos "
+                   "WHERE instruccion_id = %s ORDER BY version DESC LIMIT 1", (idInstruccion,))
+    vigente = cursor.fetchone()
+    cursor.close()
+
     error = ""
-    if request.method == "POST":
+    errorDatos = ""
+    errorVideo = ""
+    accion = request.form.get("accion", "version")
+    if request.method == "POST" and accion == "datos":
+        # Corregir titulo y proceso sin perder documentos ni historial
+        titulo = request.form["titulo"].strip()
+        proceso = request.form["proceso"].strip()
+        if titulo == "" or proceso == "":
+            errorDatos = "El título y el proceso son obligatorios."
+        else:
+            cursor = conexion.cursor()
+            cursor.execute("UPDATE instrucciones SET titulo = %s, proceso = %s WHERE id = %s",
+                           (titulo, proceso, idInstruccion))
+            conexion.commit()
+            cursor.close()
+            conexion.close()
+            flash("Datos de «" + titulo + "» actualizados.")
+            return redirect("/instrucciones/editar/" + str(idInstruccion))
+    elif request.method == "POST" and accion == "video":
+        # Cambiar el enlace del video de la version vigente (el video no se sube, solo su enlace)
+        enlace = request.form["enlace_video"].strip()
+        if vigente is None:
+            errorVideo = "Primero sube un documento: el enlace del video acompaña al documento."
+        else:
+            errorVideo = validar_video(enlace)
+        if errorVideo == "":
+            cursor = conexion.cursor()
+            cursor.execute("UPDATE documentos SET enlace_video = %s WHERE id = %s", (enlace or None, vigente["id"]))
+            conexion.commit()
+            cursor.close()
+            conexion.close()
+            flash("Enlace del video actualizado en la versión " + str(vigente["version"]) + " del documento.")
+            return redirect("/instrucciones/editar/" + str(idInstruccion))
+    elif request.method == "POST":
         version = request.form["version"].strip()
         if not version.isdigit():
             error = "La versión debe ser un número entero."
@@ -354,7 +472,34 @@ def editar(idInstruccion):
     historial = cursor.fetchall()
     cursor.close()
     conexion.close()
-    return render_template("editar.html", instruccion=instruccion, historial=historial, error=error)
+    return render_template("editar.html", instruccion=instruccion, historial=historial, error=error,
+                           errorDatos=errorDatos, errorVideo=errorVideo, vigente=vigente)
+
+
+# ---------- ARCHIVAR / RESTAURAR ----------
+@app.route("/instrucciones/archivar/<int:idInstruccion>", methods=["POST"])
+def archivar(idInstruccion):
+    conexion = conectar()
+    instruccion = buscar_instruccion(conexion, idInstruccion)
+    if instruccion is None:
+        conexion.close()
+        abort(404)
+    # Archivar no borra nada: solo cambia el estado. Los documentos y su historial se conservan.
+    if instruccion["estado"] == "activa":
+        nuevo = "archivada"
+        mensaje = "«" + instruccion["titulo"] + "» se archivó. Sus documentos se conservan."
+    else:
+        nuevo = "activa"
+        mensaje = "«" + instruccion["titulo"] + "» se restauró."
+    cursor = conexion.cursor()
+    cursor.execute("UPDATE instrucciones SET estado = %s WHERE id = %s", (nuevo, idInstruccion))
+    conexion.commit()
+    cursor.close()
+    conexion.close()
+    flash(mensaje)
+    if nuevo == "activa":
+        return redirect("/instrucciones?estado=archivada")
+    return redirect("/instrucciones")
 
 
 # ---------- ELIMINAR (ON DELETE CASCADE borra tambien sus documentos) ----------

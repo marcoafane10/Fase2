@@ -20,9 +20,39 @@
       <p class="sub">La versión actual es {{ instruccion['version'] }}. La nueva debe ser mayor.</p>
       {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
       <form method="POST" action="/instrucciones/editar/{{ instruccion['id'] }}" class="formulario en-fila">
+        <input type="hidden" name="accion" value="version">
         <label for="version" class="oculto">Nueva versión</label>
         <input type="text" id="version" name="version" inputmode="numeric" placeholder="{{ instruccion['version'] + 1 }}">
         <button type="submit" class="boton">Guardar versión</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Datos de la instrucción</h2>
+      {% if errorDatos %}<p class="error" role="alert">{{ errorDatos }}</p>{% endif %}
+      <form method="POST" action="/instrucciones/editar/{{ instruccion['id'] }}" class="formulario">
+        <input type="hidden" name="accion" value="datos">
+        <label for="titulo">Título</label>
+        <input type="text" id="titulo" name="titulo" value="{{ instruccion['titulo'] }}">
+        <label for="proceso">Proceso</label>
+        <input type="text" id="proceso" name="proceso" value="{{ instruccion['proceso'] }}">
+        <div class="botones"><button type="submit" class="boton boton-secundario">Guardar datos</button></div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Enlace del video</h2>
+      {% if vigente %}
+        <p class="sub">Del documento vigente: {{ vigente['nombre_original'] }} (versión {{ vigente['version'] }}).</p>
+      {% else %}
+        <p class="sub">Esta instrucción todavía no tiene documento; el enlace se agrega junto con el documento.</p>
+      {% endif %}
+      {% if errorVideo %}<p class="error" role="alert">{{ errorVideo }}</p>{% endif %}
+      <form method="POST" action="/instrucciones/editar/{{ instruccion['id'] }}" class="formulario en-fila">
+        <input type="hidden" name="accion" value="video">
+        <label for="enlace_video" class="oculto">Enlace del video</label>
+        <input type="text" id="enlace_video" name="enlace_video" value="{{ (vigente['enlace_video'] if vigente else '') or '' }}" placeholder="https://youtube.com/…">
+        <button type="submit" class="boton boton-secundario">Guardar enlace</button>
       </form>
     </section>
   </div>

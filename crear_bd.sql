@@ -23,7 +23,8 @@ CREATE TABLE instrucciones (
   titulo VARCHAR(150) NOT NULL,
   proceso VARCHAR(80) NOT NULL,
   version INT NOT NULL DEFAULT 1,
-  fecha_actualizacion DATE NOT NULL
+  fecha_actualizacion DATE NOT NULL,
+  estado ENUM('activa', 'archivada') NOT NULL DEFAULT 'activa'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Historial de versiones de la instrucción (viene del Desafío 2)

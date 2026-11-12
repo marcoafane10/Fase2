@@ -33,6 +33,16 @@
   {% endwith %}
   {% block contenido %}{% endblock %}
 </main>
+<dialog id="modal" class="modal" aria-labelledby="modal-titulo">
+  <div class="modal-icono" aria-hidden="true"></div>
+  <h2 class="modal-titulo" id="modal-titulo"></h2>
+  <p class="modal-texto"></p>
+  <div class="modal-botones">
+    <button type="button" class="boton boton-secundario modal-cancelar">Cancelar</button>
+    <button type="button" class="boton modal-aceptar">Entendido</button>
+  </div>
+</dialog>
+<script src="{{ url_for('static', filename='modal.js') }}"></script>
 <footer class="pie">Biblioteca Digital de Instrucciones · Reto de Socio Formador con Impresos Múltiples</footer>
 </body>
 </html>
