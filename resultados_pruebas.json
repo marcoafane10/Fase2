@@ -1,0 +1,173 @@
+[
+  {
+    "no": 1,
+    "que": "Subida válida de un PDF",
+    "entrada": "Empaque de producto terminado: instructivo_empaque_v1.pdf + enlace de video",
+    "esperado": "Se guarda como versión 1 con su video",
+    "obtenido": "Versión 1 guardada (13543 bytes)",
+    "url": "http://127.0.0.1:5000/instrucciones/1/documentos",
+    "captura": "1"
+  },
+  {
+    "no": 2,
+    "que": "Subida válida de un Word",
+    "entrada": "Ajuste de máquina troqueladora: instructivo_troquel.docx",
+    "esperado": "Se guarda como versión 1 (Word)",
+    "obtenido": "Versión 1 guardada como documento Word",
+    "url": "http://127.0.0.1:5000/instrucciones/2/documentos",
+    "captura": "2"
+  },
+  {
+    "no": 3,
+    "que": "Tipo de archivo no permitido",
+    "entrada": "notas.txt",
+    "esperado": "Mensaje de error y no se guarda",
+    "obtenido": "Muestra 'Tipo de archivo no permitido' y no se guardó",
+    "url": "http://127.0.0.1:5000/instrucciones/3/documentos",
+    "captura": "3"
+  },
+  {
+    "no": 4,
+    "que": "Archivo demasiado grande",
+    "entrada": "manual_completo.pdf de 11 MB (máximo 10 MB)",
+    "esperado": "Mensaje de error y no se guarda",
+    "obtenido": "Muestra el tamaño y el máximo; no se guardó",
+    "url": "http://127.0.0.1:5000/instrucciones/3/documentos",
+    "captura": "4"
+  },
+  {
+    "no": 5,
+    "que": "Archivo vacío o sin archivo",
+    "entrada": "vacio.pdf de 0 bytes; luego enviar sin elegir archivo",
+    "esperado": "Mensaje de error en ambos casos y no se guarda",
+    "obtenido": "Muestra 'El archivo está vacío' y 'Elige un archivo'",
+    "url": "http://127.0.0.1:5000/instrucciones/3/documentos",
+    "captura": "5"
+  },
+  {
+    "no": 6,
+    "que": "Segunda subida crea la versión 2",
+    "entrada": "Empaque: instructivo_empaque_v2.pdf",
+    "esperado": "Versión 2 nueva; la versión 1 se conserva",
+    "obtenido": "Hay 2 versiones: v1 y v2",
+    "url": "http://127.0.0.1:5000/instrucciones/1/documentos",
+    "captura": "6"
+  },
+  {
+    "no": 7,
+    "que": "Estados vigente y obsoleta",
+    "entrada": "Ver las versiones de Empaque",
+    "esperado": "v2 vigente (la más reciente), v1 obsoleta",
+    "obtenido": "v2: vigente, v1: obsoleta",
+    "url": "http://127.0.0.1:5000/instrucciones/1/documentos",
+    "captura": "7"
+  },
+  {
+    "no": 8,
+    "que": "Descarga del mismo archivo",
+    "entrada": "Descargar la versión 1 de Empaque",
+    "esperado": "Se descarga instructivo_empaque_v1.pdf idéntico al subido",
+    "obtenido": "Mismo tamaño y mismo contenido byte por byte",
+    "url": "http://127.0.0.1:5000/documentos/1/descargar",
+    "captura": "8"
+  },
+  {
+    "no": 9,
+    "que": "Descarga inexistente",
+    "entrada": "/documentos/9999/descargar",
+    "esperado": "Responde 404",
+    "obtenido": "Responde 404",
+    "url": "http://127.0.0.1:5000/documentos/9999/descargar",
+    "captura": "9"
+  },
+  {
+    "no": 10,
+    "que": "Enlace de video inválido",
+    "entrada": "tinta.pdf con enlace www.video-sin-protocolo.com",
+    "esperado": "Mensaje de error y no se guarda",
+    "obtenido": "Pide que empiece con http:// o https://; no se guardó",
+    "url": "http://127.0.0.1:5000/instrucciones/3/documentos",
+    "captura": "10"
+  },
+  {
+    "no": 11,
+    "que": "Resumen con documento y video",
+    "entrada": "Empaque con documento y video; Troquel solo documento; 6 sin documento",
+    "esperado": "Completas: 1, Falta video: 1, Sin documento: 6",
+    "obtenido": "Completas: 1, Falta video: 1, Sin documento: 6",
+    "url": "http://127.0.0.1:5000/resumen",
+    "captura": "11"
+  },
+  {
+    "no": 12,
+    "que": "Eliminar borra sus archivos",
+    "entrada": "Eliminar Ajuste de máquina troqueladora (tenía 1 documento)",
+    "esperado": "Se borran la instrucción y sus documentos",
+    "obtenido": "Quedan 0 documentos de esa instrucción",
+    "url": "http://127.0.0.1:5000/instrucciones",
+    "captura": "12"
+  },
+  {
+    "no": 13,
+    "que": "Mejora de Marco: buscador y filtros",
+    "entrada": "Buscar 'instructivo_empaque'; filtrar Impresión; buscar ' OR 1=1 --",
+    "esperado": "1 resultado (por nombre de archivo); 2 de Impresión; 0 (sin inyección SQL)",
+    "obtenido": "1; 2; 0",
+    "url": "http://127.0.0.1:5000/instrucciones?q=instructivo_empaque",
+    "captura": "13"
+  },
+  {
+    "no": 14,
+    "que": "Mejora de Ever: porcentajes por proceso",
+    "entrada": "Resumen con 7 instrucciones (1 completa)",
+    "esperado": "14.3% completas, 0.0% falta video, 85.7% sin documento y tabla por proceso",
+    "obtenido": "14.3%, 0.0%, 85.7%",
+    "url": "http://127.0.0.1:5000/resumen",
+    "captura": "14"
+  },
+  {
+    "no": 15,
+    "que": "Mejora de Luis: archivar",
+    "entrada": "Archivar Empaque de producto terminado (2 versiones)",
+    "esperado": "Sale de activas, aparece en Archivadas y conserva sus 2 documentos",
+    "obtenido": "Solo en Archivadas, con 2 documentos",
+    "url": "http://127.0.0.1:5000/instrucciones?estado=archivada",
+    "captura": "15"
+  },
+  {
+    "no": 16,
+    "que": "Mejora de Rodrigo: editar datos y video",
+    "entrada": "Nuevo título y nuevo enlace de video en Empaque",
+    "esperado": "Se guardan sin perder documentos",
+    "obtenido": "Título y enlace de la versión 2 actualizados",
+    "url": "http://127.0.0.1:5000/instrucciones/editar/1",
+    "captura": "16"
+  },
+  {
+    "no": 17,
+    "que": "Mejora de Moisés: exportar a CSV",
+    "entrada": "Exportar a Excel (CSV)",
+    "esperado": "Archivo CSV con una fila por instrucción y la versión del documento",
+    "obtenido": "7 filas; Empaque con documento versión 2",
+    "url": "http://127.0.0.1:5000/instrucciones/exportar.csv",
+    "captura": "17"
+  },
+  {
+    "no": 18,
+    "que": "Registro con documento",
+    "entrada": "Laminado de portadas, Acabados, v1 + laminado.docx",
+    "esperado": "Se registra la instrucción con su documento versión 1",
+    "obtenido": "Registrada con documento v1",
+    "url": "http://127.0.0.1:5000/instrucciones/nueva",
+    "captura": "18"
+  },
+  {
+    "no": 19,
+    "que": "Errores y confirmación en ventana modal",
+    "entrada": "Subir notas.txt; luego tocar Eliminar en el listado",
+    "esperado": "El error y la confirmación aparecen en un modal dentro del sistema, no en una ventana del navegador",
+    "obtenido": "Modal del sistema con el error; Eliminar pide confirmación en el modal",
+    "url": "http://127.0.0.1:5000/instrucciones",
+    "captura": "19"
+  }
+]

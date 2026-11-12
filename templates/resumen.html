@@ -10,10 +10,44 @@
 </div>
 
 <div class="tarjetas" data-completas="{{ completas }}" data-falta-video="{{ faltaVideo }}" data-sin-documento="{{ sinDocumento }}">
-  <div class="tarjeta completa"><span>Completas</span><strong>{{ completas }}</strong></div>
-  <div class="tarjeta falta-video"><span>Falta video</span><strong>{{ faltaVideo }}</strong></div>
-  <div class="tarjeta sin-documento"><span>Sin documento</span><strong>{{ sinDocumento }}</strong></div>
+  <div class="tarjeta completa"><span>Completas</span><strong>{{ completas }}</strong><small>{{ porcentaje_completas }}%</small></div>
+  <div class="tarjeta falta-video"><span>Falta video</span><strong>{{ faltaVideo }}</strong><small>{{ porcentaje_falta_video }}%</small></div>
+  <div class="tarjeta sin-documento"><span>Sin documento</span><strong>{{ sinDocumento }}</strong><small>{{ porcentaje_sin_documento }}%</small></div>
 </div>
+
+<div class="panel">
+  <div class="barra-titulo"><h2>{{ porcentaje_completas }}% de las instrucciones tienen documento y video</h2><span class="sub">{{ total }} instrucciones</span></div>
+  <div class="barra" role="img" aria-label="{{ porcentaje_completas }}% completas, {{ porcentaje_falta_video }}% falta video, {{ porcentaje_sin_documento }}% sin documento">
+    <span class="tramo completa" style="--w: {{ porcentaje_completas }}%"></span>
+    <span class="tramo falta-video" style="--w: {{ porcentaje_falta_video }}%"></span>
+    <span class="tramo sin-documento" style="--w: {{ porcentaje_sin_documento }}%"></span>
+  </div>
+</div>
+
+<div class="rejilla-resumen">
+<section class="panel">
+  <h2>Por proceso</h2>
+  <div class="tabla-contenedor">
+  <table class="tabla tabla-compacta">
+    <thead><tr><th>Proceso</th><th class="num">Completas</th><th class="num">Falta video</th><th class="num">Sin doc.</th><th>Distribución</th></tr></thead>
+    <tbody>
+    {% for nombre, c in porProceso %}
+      <tr class="fila-animada" style="--n: {{ loop.index0 }}">
+        <td><a class="titulo-enlace" href="/instrucciones?proceso={{ nombre }}">{{ nombre }}</a></td>
+        <td class="num">{{ c['completa'] }}</td><td class="num">{{ c['falta video'] }}</td><td class="num">{{ c['sin documento'] }}</td>
+        <td><div class="barra barra-mini">
+          <span class="tramo completa" style="--w: {{ (c['completa'] * 100 / c['total'])|round(1) }}%"></span>
+          <span class="tramo falta-video" style="--w: {{ (c['falta video'] * 100 / c['total'])|round(1) }}%"></span>
+          <span class="tramo sin-documento" style="--w: {{ (c['sin documento'] * 100 / c['total'])|round(1) }}%"></span>
+        </div></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="vacio">No hay instrucciones.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
 
 <section class="panel">
   <h2>Detalle (primero las que necesitan atención)</h2>
@@ -29,4 +63,5 @@
   </ul>
   <p class="sub">Total: {{ total }} instrucciones.</p>
 </section>
+</div>
 {% endblock %}

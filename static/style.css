@@ -261,3 +261,24 @@ input[type="file"]:hover { border-color: var(--azul); background: var(--azul-sua
 .rejilla-documentos { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 20px; align-items: start; }
 .tabla-versiones { min-width: 520px; }
 @media (max-width: 960px) { .rejilla-documentos { grid-template-columns: minmax(0, 1fr); } }
+.botones-encabezado { display: flex; gap: 10px; flex-wrap: wrap; }
+@media (max-width: 560px) { .botones-encabezado { width: 100%; } .botones-encabezado .boton { flex: 1 1 auto; } }
+
+/* ---------- Ventana modal del sistema (errores y confirmaciones) ---------- */
+.modal { border: 0; border-radius: 14px; padding: 28px 28px 22px; width: min(440px, calc(100vw - 32px)); box-shadow: 0 24px 60px -12px rgba(28, 35, 51, .45); text-align: center; color: var(--texto); }
+.modal::backdrop { background: rgba(28, 35, 51, .45); backdrop-filter: blur(2px); }
+.modal[open] { animation: modal-entrar .28s var(--curva); }
+.modal[open]::backdrop { animation: aparecer-fondo .28s ease; }
+.modal-icono { width: 52px; height: 52px; margin: 0 auto 12px; border-radius: 50%; display: grid; place-items: center; font: 800 26px/1 var(--fuente); }
+.modal-error .modal-icono { background: var(--desact-fondo); color: var(--desact); }
+.modal-error .modal-icono::before { content: "!"; }
+.modal-confirmar .modal-icono { background: var(--revisar-fondo); color: var(--revisar); }
+.modal-confirmar .modal-icono::before { content: "?"; }
+.modal-titulo { font-size: 20px; margin: 0 0 8px; }
+.modal-texto { color: var(--gris); margin: 0 0 20px; }
+.modal-botones { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.modal-confirmar .modal-aceptar { background: var(--desact); }
+.modal-confirmar .modal-aceptar:hover { background: #8e1a22; }
+@keyframes modal-entrar { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes aparecer-fondo { from { opacity: 0; } to { opacity: 1; } }
+[hidden] { display: none !important; }

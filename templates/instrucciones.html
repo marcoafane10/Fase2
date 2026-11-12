@@ -6,7 +6,39 @@
     <p class="etiqueta">Biblioteca</p>
     <h1>Instrucciones de trabajo</h1>
   </div>
-  <a class="boton" href="/instrucciones/nueva">+ Registrar instrucción</a>
+  <div class="botones-encabezado">
+    <a class="boton boton-secundario" href="/instrucciones/exportar.csv">Exportar a Excel (CSV)</a>
+    <a class="boton" href="/instrucciones/nueva">+ Registrar instrucción</a>
+  </div>
+</div>
+
+<form class="filtros" method="GET" action="/instrucciones">
+  <input type="hidden" name="estado" value="{{ estado }}">
+  <label class="campo-buscar">
+    <span class="oculto">Buscar</span>
+    <input type="search" name="q" value="{{ busqueda }}" placeholder="Buscar por título o nombre de archivo…">
+  </label>
+  <label>
+    <span class="oculto">Proceso</span>
+    <select name="proceso" onchange="this.form.submit()">
+      <option value="">Todos los procesos</option>
+      {% for p in procesos %}<option value="{{ p }}" {{ 'selected' if p == proceso }}>{{ p }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>
+    <span class="oculto">Estado del documento</span>
+    <select name="documento" onchange="this.form.submit()">
+      <option value="">Todos los estados</option>
+      {% for e in ['completa', 'falta video', 'sin documento'] %}<option value="{{ e }}" {{ 'selected' if e == filtroDoc }}>{{ e|capitalize }}</option>{% endfor %}
+    </select>
+  </label>
+  <button type="submit" class="boton boton-secundario">Buscar</button>
+  {% if busqueda or proceso or filtroDoc %}<a class="limpiar" href="/instrucciones?estado={{ estado }}">Quitar filtros</a>{% endif %}
+</form>
+
+<div class="pestanas">
+  <a href="/instrucciones?estado=activa" class="{{ 'activa' if estado == 'activa' }}">Activas</a>
+  <a href="/instrucciones?estado=archivada" class="{{ 'activa' if estado == 'archivada' }}">Archivadas <span class="contador">{{ archivadas }}</span></a>
 </div>
 
 <div class="tabla-contenedor">
@@ -28,16 +60,18 @@
       <td class="celda-acciones"><div class="acciones">
         <a class="boton boton-chico" href="/instrucciones/{{ i['id'] }}/documentos">Documentos</a>
         <a class="boton boton-chico boton-secundario" href="/instrucciones/editar/{{ i['id'] }}">Versión</a>
-        <form method="POST" action="/instrucciones/eliminar/{{ i['id'] }}" onsubmit="return confirm('¿Eliminar «{{ i['titulo'] }}» y todos sus documentos?');">
+        <form method="POST" action="/instrucciones/archivar/{{ i['id'] }}"><button class="boton boton-chico boton-secundario" type="submit">{{ 'Archivar' if estado == 'activa' else 'Restaurar' }}</button></form>
+        <form method="POST" action="/instrucciones/eliminar/{{ i['id'] }}" data-titulo="¿Eliminar instrucción?" data-boton="Sí, eliminar"
+              data-confirmar="Se eliminará «{{ i['titulo'] }}» junto con todas las versiones de su documento. Esta acción no se puede deshacer.">
           <button class="boton boton-chico boton-peligro" type="submit">Eliminar</button>
         </form>
       </div></td>
     </tr>
   {% else %}
-    <tr><td colspan="6" class="vacio">Todavía no hay instrucciones. <a href="/instrucciones/nueva">Registra la primera</a>.</td></tr>
+    <tr><td colspan="6" class="vacio">{% if busqueda or proceso or filtroDoc %}No hay instrucciones que coincidan con la búsqueda.{% elif estado == 'archivada' %}No hay instrucciones archivadas.{% else %}Todavía no hay instrucciones. <a href="/instrucciones/nueva">Registra la primera</a>.{% endif %}</td></tr>
   {% endfor %}
   </tbody>
 </table>
 </div>
-<p class="nota">Se muestran {{ instrucciones|length }} instrucciones. Eliminar una instrucción borra también todas las versiones de su documento.</p>
+<p class="nota">Se muestran {{ instrucciones|length }} instrucciones {{ 'activas' if estado == 'activa' else 'archivadas' }}. Archivar la oculta sin borrar sus documentos; eliminar borra también todas las versiones de su documento.</p>
 {% endblock %}
