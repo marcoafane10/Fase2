@@ -1,0 +1,92 @@
+from flask import Flask, render_template, request, redirect, url_for
+import pymysql
+
+app = Flask(__name__)
+
+
+def conectar():
+    # Datos por defecto de XAMPP: usuario root sin contraseña
+    return pymysql.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="examen_fp",
+        cursorclass=pymysql.cursors.DictCursor,
+    )
+
+
+def leer_formulario():
+    # Los campos opcionales vacíos se guardan como NULL
+    nombre = request.form["nombre"].strip()
+    especie = request.form["especie"].strip()
+    raza = request.form.get("raza", "").strip() or None
+    fecha = request.form.get("fecha_nacimiento", "") or None
+    peso = request.form["peso_kg"]
+    return (nombre, especie, raza, fecha, peso)
+
+
+# LISTAR
+@app.route("/")
+def index():
+    con = conectar()
+    with con.cursor() as cur:
+        cur.execute("SELECT * FROM mascotas ORDER BY id")
+        mascotas = cur.fetchall()
+    con.close()
+    return render_template("index.html", mascotas=mascotas)
+
+
+# CREAR
+@app.route("/nueva", methods=["GET", "POST"])
+def nueva():
+    if request.method == "POST":
+        con = conectar()
+        with con.cursor() as cur:
+            cur.execute(
+                "INSERT INTO mascotas (nombre, especie, raza, fecha_nacimiento, peso_kg) "
+                "VALUES (%s, %s, %s, %s, %s)",
+                leer_formulario(),
+            )
+        con.commit()
+        con.close()
+        return redirect(url_for("index"))
+    return render_template("form.html", mascota=None)
+
+
+# EDITAR
+@app.route("/editar/<int:id>", methods=["GET", "POST"])
+def editar(id):
+    con = conectar()
+    if request.method == "POST":
+        with con.cursor() as cur:
+            cur.execute(
+                "UPDATE mascotas SET nombre=%s, especie=%s, raza=%s, "
+                "fecha_nacimiento=%s, peso_kg=%s WHERE id=%s",
+                leer_formulario() + (id,),
+            )
+        con.commit()
+        con.close()
+        return redirect(url_for("index"))
+
+    with con.cursor() as cur:
+        cur.execute("SELECT * FROM mascotas WHERE id=%s", (id,))
+        mascota = cur.fetchone()
+    con.close()
+    if mascota is None:
+        return redirect(url_for("index"))
+    return render_template("form.html", mascota=mascota)
+
+
+# ELIMINAR
+@app.route("/eliminar/<int:id>", methods=["POST"])
+def eliminar(id):
+    con = conectar()
+    with con.cursor() as cur:
+        cur.execute("DELETE FROM mascotas WHERE id=%s", (id,))
+    con.commit()
+    con.close()
+    return redirect(url_for("index"))
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
