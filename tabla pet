@@ -1,0 +1,14 @@
+ - Caso 2: Veterinaria Huellitas
+CREATE DATABASE IF NOT EXISTS examen_fp;
+USE examen_fp;
+
+CREATE TABLE IF NOT EXISTS mascotas (
+    id               INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    nombre           VARCHAR(60)  NOT NULL,
+    especie          VARCHAR(30)  NOT NULL,
+    raza             VARCHAR(50),
+    fecha_nacimiento DATE,
+    peso_kg          DECIMAL(5,2) NOT NULL,
+    PRIMARY KEY (id),
+    CHECK (peso_kg > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
